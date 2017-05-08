@@ -1,23 +1,21 @@
 /*
  18. Januar 2015
- Rafael Wampfler
  
  Links:
  http://www.geekonfire.com/wiki/index.php?title=Dual_H-Bridge_Motor_Driver
  http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/
  */
  
-#define ENA 5 // schwarz, PWM
-#define IN1 6 // weiss
-#define IN2 7 // grau
-#define IN3 8 // violett
-#define IN4 9 // blau
-#define ENB 10 // grün, PWM
-#define trigger 11 // orange
-#define echo 12 // rot
+#define ENA 5       // schwarz, PWM
+#define IN1 6       // weiss
+#define IN2 7       // grau
+#define IN3 8       // violett
+#define IN4 9       // blau
+#define ENB 10      // grün, PWM
+#define trigger 11  // orange
+#define echo 12     // rot
 #define LED 13
 
-// the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin (9600);
   
@@ -34,14 +32,9 @@ void setup() {
   
   pinMode(LED, OUTPUT);
   
-  // set motor direction
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  stop();
 }
 
-// the loop function runs over and over again forever
 void loop() {
   int speed = 150;
   
@@ -84,68 +77,59 @@ void forward(int speed, int millis) {
   analogWrite(ENA, speed);
   analogWrite(ENB, speed);
   delay(millis);
+  stop();
 }
 
 void backward(int speed, int millis) {
-  // turn motor direction
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  
-  // drive
+  reverseA();
+  reverseB();
   forward(speed, millis);
-  
-  // turn back motor direction
+}
+
+void stop() {
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
+
+  // reset motor direction to forward
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
 
-void stop() {
-  analogWrite(ENA, 0);
-  analogWrite(ENB, 0);
+void reverseA() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+}
+
+void reverseB() {
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  
 }
 
 void turnLeft(int speed, int millis) {
   analogWrite(ENA, speed);
   analogWrite(ENB, 0);
   delay(millis);
+  stop();
 }
 
 void turnRight(int speed, int millis) {
   analogWrite(ENA, 0);
   analogWrite(ENB, speed);
   delay(millis);
+  stop();
 }
 
 void tankTurnLeft(int speed, int millis) {
-  // turn left motor direction
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  
-  // drive
-  analogWrite(ENA, speed);
-  analogWrite(ENB, speed);
-  
-  // turn back motor direction
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  reverseB();
+  forward(speed, millis);
 }
 
 void tankTurnRight(int speed, int millis) {
-  // turn right motor direction
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  
-  // drive
-  analogWrite(ENA, speed);
-  analogWrite(ENB, speed);
-  
-  // turn back motor direction
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  reverseA();
+  forward(speed, millis);
 }
 
 void blink(int times) {
